@@ -5,7 +5,7 @@ This is a fork of LHL LightBnB_WebApp. This app is the LHL version of AirBnB. Us
 
 ## Final Product
 
-!["Screenshot of the main page"](https://github.com/marijkevanhell/tweeter/blob/master/public/images/Desktop-Main-Page.png?raw=true)
+!["Screenshot of the main page"](https://github.com/marijkevanhell/LightBnB/blob/main/images/main_page.png?raw=true)
 
 ## Getting Started
 
