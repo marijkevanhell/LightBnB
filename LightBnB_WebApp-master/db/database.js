@@ -111,12 +111,7 @@ const getAllProperties = function(options, limit = 10) {
 
   if (options.owner_id) {
     queryParams.push(options.owner_id);
-    filterQuery.push(`WHERE owner_id = $${queryParams.length}`);
-  }
-
-  if (options.minimum_rating) {
-    queryParams.push(options.minimum_rating);
-    filterQuery.push(`property_reviews.rating >= $${queryParams.length}`);
+    filterQuery.push(`owner_id = $${queryParams.length}`);
   }
 
   if (options.minimum_price_per_night) {
@@ -129,17 +124,30 @@ const getAllProperties = function(options, limit = 10) {
     filterQuery.push(`cost_per_night <= $${queryParams.length}`);
   }
 
-  queryParams.push(limit);
-
+  
   //if more than one param, option added to queryString using WHERE and AND
-  if (filterQuery.length > 0) {
+  if (filterQuery.length > 1) {
     queryString += `WHERE ${filterQuery.join(" AND ")} `;
   }
+
+  if (filterQuery.length == 1) {
+    queryString += `WHERE ${filterQuery[0]} `;
+  }
+
+  queryString += `
+  GROUP BY properties.id
+  `;
+
+  if (options.minimum_rating) {
+    queryParams.push(options.minimum_rating);
+    queryString += ` HAVING avg(property_reviews.rating) >= $${queryParams.length} `;
+  }
+
+  queryParams.push(limit);
 
   //4. Add any query that comes after the WHERE clause
   //adds GROUP BY and ORDER BY to queryString to sort
   queryString += `
-  GROUP BY properties.id
   ORDER BY cost_per_night
   `;
 
@@ -171,7 +179,7 @@ const addProperty = function(property) {
     property.description,
     property.thumbnail_photo_url,
     property.cover_photo_url,
-    property.cost_per_night,
+    property.cost_per_night * 100,
     property.street,
     property.city,
     property.province,
